@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 export default function Home() {
   const [clothes, setClothes] = useState([]);
@@ -56,9 +57,9 @@ export default function Home() {
         </select>
 
         {/* Add Button */}
-        <a href="/add" className="bg-blue-500 text-white px-3 py-2 rounded">
+        <Link href="/add" className="bg-blue-500 text-white px-3 py-2 rounded">
           + Add
-        </a>
+        </Link>
       </div>
 
       <table className="mt-4 border-collapse w-full">
@@ -81,9 +82,9 @@ export default function Home() {
               <td className="p-2">{c.price}</td>
               <td className="p-2">{c.quantity}</td>
               <td className="p-2">
-                <a href={`/add?id=${c.id}`} className="text-blue-500">
+                <Link href={`/add?id=${c.id}`} className="text-blue-500">
                   Edit
-                </a>{" "}
+                </Link>{" "}
                 |{" "}
                 <button
                   onClick={() => handleDelete(c.id)}
