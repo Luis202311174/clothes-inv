@@ -11,6 +11,7 @@
     "export": "next build"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.75.0",
     "mysql2": "^3.15.2",
     "next": "15.5.4",
     "react": "19.1.0",

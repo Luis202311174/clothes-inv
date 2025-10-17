@@ -1,32 +1,37 @@
-import { query } from "@/lib/db";
+import { supabase } from '@/lib/db';
 
 export default async function handler(req, res) {
-  if (req.method === "GET") {
-    const { search, category } = req.query;
+  try {
+    if (req.method === 'GET') {
+      const { search = '', category = '' } = req.query;
 
-    let sql = "SELECT * FROM clothes WHERE 1=1";
-    const params = [];
+      // Base query
+      let query = supabase.from('clothes').select('*');
 
-    if (search) {
-      sql += " AND (name LIKE ? OR color LIKE ?)";
-      params.push(`%${search}%`, `%${search}%`);
+      if (category) query = query.eq('category', category);
+      if (search) query = query.ilike('name', `%${search}%`);
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+      return res.status(200).json(data);
     }
 
-    if (category) {
-      sql += " AND category = ?";
-      params.push(category);
+    if (req.method === 'POST') {
+      const { name, category, size, color, price, quantity } = req.body;
+
+      const { error } = await supabase
+        .from('clothes')
+        .insert([{ name, category, size, color, price, quantity }]);
+
+      if (error) throw error;
+      return res.status(201).json({ message: 'Added successfully' });
     }
 
-    const data = await query(sql, params);
-    res.json(data);
-  }
-
-  if (req.method === "POST") {
-    const { name, category, size, color, price, quantity } = req.body;
-    await query(
-      "INSERT INTO clothes (name, category, size, color, price, quantity) VALUES (?, ?, ?, ?, ?, ?)",
-      [name, category, size, color, price, quantity]
-    );
-    res.status(201).json({ message: "Added successfully" });
+    res.setHeader('Allow', ['GET', 'POST']);
+    return res.status(405).end(`Method ${req.method} Not Allowed`);
+  } catch (err) {
+    console.error('API error:', err.message);
+    return res.status(500).json({ error: err.message });
   }
 }
